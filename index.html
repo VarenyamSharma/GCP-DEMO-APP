@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GCP Demo App · {{VERSION}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --accent: {{COLOR}};
+    --bg: #080810;
+    --surface: #0e0e1a;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+    --mono: 'Space Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow blob */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 500px;
+    background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse 2s ease infinite;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+
+  /* ── HERO ── */
+  .hero { margin-bottom: 3rem; animation: fadeUp 0.7s 0.1s ease both; }
+
+  .version-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+  .version-tag::before {
+    content: '';
+    display: block; width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+    text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    font-family: var(--mono);
+    line-height: 1.6;
+    max-width: 520px;
+  }
+
+  /* ── CARDS GRID ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 1.5rem;
+    transition: background 0.2s;
+  }
+  .card:hover { background: #13131f; }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    word-break: break-all;
+  }
+
+  .card-value.accent { color: var(--accent); }
+
+  /* ── ENDPOINTS ── */
+  .endpoints {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.7s 0.3s ease both;
+    margin-bottom: 2rem;
+  }
+
+  .endpoints-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .endpoint-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .endpoint-row:last-child { border-bottom: none; }
+  .endpoint-row:hover { background: rgba(255,255,255,0.02); }
+
+  .method {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .ep-path {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: #fff;
+    flex: 1;
+  }
+  .ep-desc { font-size: 0.8rem; color: var(--muted); }
+
+  /* ── LIVE DATA ── */
+  .live-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+
+  .live-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 1rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e;
+    animation: pulse 1.5s ease infinite;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .json-key   { color: var(--muted); }
+  .json-str   { color: #86efac; }
+  .json-num   { color: #fbbf24; }
+  .json-bool  { color: #f472b6; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    animation: fadeUp 0.7s 0.5s ease both;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      GCP Demo App
+    </div>
+    <div class="badge">Node.js · HTTP/1.1</div>
+  </header>
+
+  <section class="hero">
+    <div class="version-tag">DEPLOYED · {{VERSION}}</div>
+    <h1>Hello from<br/><em>{{VERSION}}</em></h1>
+    <p class="subtitle">A lightweight Node.js app built for GCP deployments — App Engine, Cloud Run, Docker, traffic splitting, and VPC scenarios.</p>
+  </section>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Version</div>
+      <div class="card-value accent" id="v-version">{{VERSION}}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Hostname</div>
+      <div class="card-value" id="v-hostname">{{HOSTNAME}}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Uptime</div>
+      <div class="card-value" id="v-uptime">—</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Timestamp</div>
+      <div class="card-value" id="v-time">—</div>
+    </div>
+  </div>
+
+  <div class="endpoints">
+    <div class="endpoints-header">Available Endpoints</div>
+    <div class="endpoint-row">
+      <span class="method">GET</span>
+      <span class="ep-path">/</span>
+      <span class="ep-desc">This page</span>
+    </div>
+    <div class="endpoint-row">
+      <span class="method">GET</span>
+      <span class="ep-path">/health</span>
+      <span class="ep-desc">Health check (JSON)</span>
+    </div>
+    <div class="endpoint-row">
+      <span class="method">GET</span>
+      <span class="ep-path">/api/info</span>
+      <span class="ep-desc">Instance metadata (JSON)</span>
+    </div>
+  </div>
+
+  <div class="live-section">
+    <div class="live-header"><div class="live-dot"></div>Live /api/info response</div>
+    <pre id="live-json">Loading…</pre>
+  </div>
+
+  <footer>
+    <span>GCP Demo App · {{VERSION}}</span>
+    <span id="f-time"></span>
+  </footer>
+
+</div>
+
+<script>
+  function colorize(json) {
+    return json
+      .replace(/("[\w]+")\s*:/g, '<span class="json-key">$1</span>:')
+      .replace(/: "([^"]+)"/g, ': <span class="json-str">"$1"</span>')
+      .replace(/: (\d+)/g, ': <span class="json-num">$1</span>')
+      .replace(/: (true|false)/g, ': <span class="json-bool">$1</span>');
+  }
+
+  async function fetchInfo() {
+    try {
+      const res = await fetch('/api/info');
+      const data = await res.json();
+      document.getElementById('live-json').innerHTML = colorize(JSON.stringify(data, null, 2));
+      document.getElementById('v-uptime').textContent = data.uptime + 's';
+      document.getElementById('v-time').textContent = new Date(data.timestamp).toLocaleTimeString();
+      document.getElementById('f-time').textContent = new Date(data.timestamp).toUTCString();
+    } catch (e) {
+      document.getElementById('live-json').textContent = 'Error fetching data.';
+    }
+  }
+
+  fetchInfo();
+  setInterval(fetchInfo, 5000);
+</script>
+</body>
+</html>

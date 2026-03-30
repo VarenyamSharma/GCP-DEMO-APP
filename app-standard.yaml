@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────────────────────
+# Q1 (Standard) + Q2: App Engine STANDARD — Node.js
+# Includes manual scaling (Q2) + VPC connector (Q1 outbound IP)
+# ─────────────────────────────────────────────────────────────
+runtime: nodejs20
+env: standard
+
+service: default
+
+# ── Q2: Manual scaling — fixed number of instances ───────────
+manual_scaling:
+  instances: 2          # change to desired fixed count
+
+# ── Q1 Standard: VPC Access connector for fixed outbound IP ──
+vpc_access_connector:
+  name: projects/YOUR_PROJECT_ID/locations/YOUR_REGION/connectors/YOUR_CONNECTOR_NAME
+  egress_setting: all-traffic   # route ALL outbound through the connector → Cloud NAT
+
+env_variables:
+  NODE_ENV: "production"
+  APP_VERSION: "v1"
+  APP_COLOR: "#6366f1"

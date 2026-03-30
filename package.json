@@ -1,0 +1,15 @@
+{
+  "name": "gcp-demo-app",
+  "version": "1.0.0",
+  "description": "Lightweight Node.js app for GCP deployment scenarios",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:v1": "APP_VERSION=v1 APP_COLOR=#6366f1 node server.js",
+    "start:v2": "APP_VERSION=v2 APP_COLOR=#ec4899 node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
